@@ -1,12 +1,9 @@
 import React, {Component} from 'react';
 
 export default class OpengraphReactComponent extends Component {
-  constructor(props){
-    super(props);
-    this.state = state = {
-      result: null,
-      error: null,
-    }
+  state = {
+    result: null,
+    error: null,
   };
 
 
