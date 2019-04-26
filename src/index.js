@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import '../other/App.css';
 
 export default class OpengraphReactComponent extends Component {
   state = {
