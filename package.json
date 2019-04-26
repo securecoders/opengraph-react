@@ -2,11 +2,9 @@
   "name": "opengraph-react",
   "version": "1.0.0",
   "description": "Handy React components for www.opengraph.io",
-  "main": "build/index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack --watch",
-    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -29,8 +27,7 @@
   },
   "homepage": "https://github.com/securecoders/opengraph-react#readme",
   "dependencies": {
-    "react": "^16.8.6",
-    "webpack": "^4.30.0"
+    "react": "^16.8.6"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
