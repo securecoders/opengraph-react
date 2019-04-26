@@ -1,8 +1,8 @@
 {
   "name": "opengraph-react",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Handy React components for www.opengraph.io",
-  "main": "./src/index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack --watch",
