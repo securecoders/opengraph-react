@@ -1,6 +1,6 @@
 # Opengraph-react
 
-Opengraph react is a set of handy react components for displaying site previews with the information gathered by https://opengraph.io.
+Opengraph react is a set of handy react components for displaying site previews with the information gathered by https://opengraph.io. Check out a live preview at https://dashboard.opengraph.io/debug
 
 ## Installation
 
