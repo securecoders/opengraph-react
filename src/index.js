@@ -8,10 +8,22 @@ export default class OpengraphReactComponent extends Component {
 
 
   componentDidMount() {
+    const {useProxy, fullRender, forceCacheUpdate} = this.props;
     const acceptLang = this.props.acceptLang || 'auto';
     const appId = this.props.appId;
     const site = encodeURIComponent(this.props.site);
     const url = `https://opengraph.io/api/1.1/site/${site}?accept_lang${acceptLang}&app_id=${appId}`;
+
+    if(useProxy){
+      url = url + '&use_proxy=true'
+    }
+    if(forceCacheUpdate){
+      url = url + '&cache_ok=false';
+    }
+    if(fullRender){
+      url = url + '&full_render=true';
+    }
+
     fetch(url)
       .then((res) => res.json())
       .then((result) => {
