@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
 
 export default class OpengraphReactComponent extends Component {
-  state = {
-    result: null,
-    error: null,
+  constructor(props){
+    super(props);
+    this.state = state = {
+      result: null,
+      error: null,
+    }
   };
+
 
   componentDidMount() {
     const acceptLang = this.props.acceptLang || 'auto';
