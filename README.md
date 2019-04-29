@@ -1,6 +1,16 @@
 # Opengraph-react
 
-Opengraph react is a set of handy react components for displaying site previews with the information gathered by https://opengraph.io. Check out a live preview at https://dashboard.opengraph.io/debug
+Opengraph react is a set of handy react components for displaying site previews with the information gathered by https://opengraph.io. Check out a live preview at https://dashboard.opengraph.io/debug.
+
+## What is Opengraph.io?
+
+OpenGraph.io client library for nodejs. Given a URL, the client will make a HTTP request to OpenGraph.io which will scrape the site for OpenGraph tags. If tags exist the tags will be returned to you.
+
+Often times the appropriate tags will not exist and this is where OpenGraph.io shines. It will infer what the OpenGraph tags probably would be an return them to you as hybridGraph.
+
+The hybridGraph results will always default to any OpenGraph tags that were found on the page. If only some tags were found, or none were, the missing tags will be inferred from the content on the page.
+
+For most uses, the OpenGraph.io API is free. To get a free forever key, signup at OpenGraph.io.
 
 ## Installation
 
