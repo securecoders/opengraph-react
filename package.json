@@ -1,6 +1,6 @@
 {
   "name": "opengraph-react",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Handy React components for www.opengraph.io",
   "main": "build/index.js",
   "scripts": {
@@ -20,7 +20,17 @@
     "web",
     "scraping",
     "unfurl",
-    "link"
+    "link",
+    "preview",
+    "open",
+    "graph",
+    "api",
+    "video",
+    "image",
+    "url",
+    "react",
+    "website",
+    "unfurl-url"
   ],
   "author": "Charles Wooley",
   "license": "ISC",
