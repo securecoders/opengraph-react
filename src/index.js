@@ -57,25 +57,53 @@ export default class OpengraphReactComponent extends Component {
       image = htmlInferred.image || hybridGraph.image
     }
 
+    let video;
+    if(openGraph.video){
+      video = openGraph.video.secure_url
+    } else {
+      video = hybridGraph.video || htmlInferred.video;
+    }
+
     return {
       site_name,
       title,
       url,
       favicon,
       image,
-      description
+      description,
+      video
     };
   };
 
   renderLarge = (resultsToUse) => {
     let imageClassName = this.props.spin ? 'responsiveImage App-logo' : 'responsiveImage';
-    return (
-      <div className="wrapperLarge">
-        {resultsToUse.image &&
+
+    let feature = null;
+
+    if(resultsToUse.video){
+      feature = (
+        <div className={"imgWrapperLarge"}>
+          <iframe
+            width="560"
+            height="315"
+            src={value.secure_url}
+            frameBorder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      )
+    }else {
+      feature = (
         <div className={"imgWrapperLarge"}>
           <img className={imageClassName} src={resultsToUse.image} alt={'alt'}/>
         </div>
-        }
+        );
+    }
+
+    return (
+      <div className="wrapperLarge">
+        { feature }
         <div className={"textWrapperLarge"}>
           <div className={"siteNameLinkWrapper"}>
             <a href={resultsToUse.url}>{resultsToUse.site_name}</a>
