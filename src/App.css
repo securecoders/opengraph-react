@@ -126,6 +126,9 @@
   .siteNameLinkWrapper{
     font-size: 14px;
   }
+  .responsiveVideo{
+    min-height: 202px;
+  }
 }
 
 @media (min-width: 460px){
@@ -144,6 +147,9 @@
   .outerWrapperSmall{
     min-width: 360px;
     width: 360px;
+  }
+  .responsiveVideo{
+    min-height: 258px;
   }
 }
 
@@ -164,11 +170,20 @@
     min-width: 600px;
     width: 600px;
   }
+  .responsiveVideo{
+    min-height: 337px;
+  }
 }
 
 
 
 .responsiveImage{
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.responsiveVideo{
   width: 100%;
   height: auto;
   border-radius: 5px;

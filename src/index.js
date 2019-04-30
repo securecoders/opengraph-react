@@ -84,8 +84,7 @@ export default class OpengraphReactComponent extends Component {
       feature = (
         <div className={"imgWrapperLarge"}>
           <iframe
-            width="560"
-            height="315"
+            className={'responsiveVideo'}
             src={resultsToUse.video}
             frameBorder="0"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -93,7 +92,7 @@ export default class OpengraphReactComponent extends Component {
           />
         </div>
       )
-    }else {
+    } else {
       feature = (
         <div className={"imgWrapperLarge"}>
           <img className={imageClassName} src={resultsToUse.image} alt={'alt'}/>
