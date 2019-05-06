@@ -42,13 +42,18 @@ export default class OpengraphReactComponent extends Component {
   }
 
   getResultsToUse = () => {
-    const {openGraph, htmlInferred, hybridGraph } = this.state.result;
+    let {openGraph, htmlInferred, hybridGraph } = this.state.result;
+    // protect against null values
+    openGraph = openGraph || {};
+    htmlInferred = htmlInferred || {};
+    hybridGraph = hybridGraph || {};
 
     const site_name = openGraph.site_name || htmlInferred.site_name || hybridGraph.site_name;
     const title = openGraph.title || htmlInferred.title || hybridGraph.title;
     const url = openGraph.url || htmlInferred.url || hybridGraph.url;
     const favicon = htmlInferred.favicon || hybridGraph.favicon;
     const description = openGraph.description || htmlInferred.description || hybridGraph.description;
+    const products = hybridGraph.products || htmlInferred.products;
 
     let image;
     if(openGraph.image){
@@ -71,8 +76,28 @@ export default class OpengraphReactComponent extends Component {
       favicon,
       image,
       description,
-      video
+      video,
+      products
     };
+  };
+
+  renderLargeProduct = (resultsToUse, imageClassName) => {
+    let goodProduct = resultsToUse.products.find((p) => !!p.name);
+    let goodOffer = goodProduct.offers[0];
+    return (
+      <div className="wrapperLarge">
+        { feature }
+        <div className={"textWrapperLarge"}>
+          <div className={"siteNameLinkWrapper"}>
+            <a href={resultsToUse.url}>{goodProduct.name}</a>
+          </div>
+          <div className={"titleWrapper"}>
+            <p><i>&#9733;</i>{goodProduct.description}</p>
+          </div>
+          <p>{resultsToUse.description}</p>
+        </div>
+      </div>
+    )
   };
 
   renderLarge = (resultsToUse) => {
@@ -80,7 +105,9 @@ export default class OpengraphReactComponent extends Component {
 
     let feature = null;
 
-    if(resultsToUse.video){
+    if(resultsToUse.products){
+      return this.renderLargeProduct(resultsToUse, imageClassName)
+    } else if (resultsToUse.video && !this.props.dontUseVideo){
       feature = (
         <div className={"imgWrapperLarge"}>
           <iframe
