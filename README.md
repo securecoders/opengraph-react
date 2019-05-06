@@ -39,4 +39,4 @@ Simply install using npm:
 |acceptLang|string|accept lang header for request, defaults to "auto"|
 |useProxy|boolean|Tells opengraph whether or not to use a proxy (defaults to false)|
 |forceCacheUpdate|boolean|If this is supplied opengraph will not reply with cached result (defaults to false)|
-|fullRender|boolean|If this is supplied then opengraph will use its full page render feature (defaults to false)|
+|dontUseVideo|boolean|Component will default to supplying a video player if it finds one in the results, pass this prop to override that behavior and just display an image like normal|
