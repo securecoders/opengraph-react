@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import styles from './App.css';
+import currencyMappings from './currencyMappings';
 
 export default class OpengraphReactComponent extends Component {
   state = {
@@ -81,20 +82,110 @@ export default class OpengraphReactComponent extends Component {
     };
   };
 
+  renderStarsForRating = (rating) => {
+    let bestRating = parseInt(rating.bestRating) || 0;
+    let ratingValue = parseFloat(rating.ratingValue) || 0;
+
+    let starArr = [];
+    for (let i = 0; i < bestRating; i++){
+      if(i < ratingValue){
+        starArr.push(<i  key={`star-${i}`} className={"coloredStar"}>★</i>)
+      } else {
+        starArr.push(<i key={`star-${i}`} >★</i>)
+      }
+    }
+
+    return (
+      <p>
+        {starArr}
+        <span className={'greyText'}>{` ${rating.reviewCount} reviews`}</span>
+      </p>
+    )
+
+  };
+
+  truncateDescription = (description) => {
+    description = description || "";
+    if(description.length < 125) {
+      return description
+    } else {
+      description = description.slice(0, 123);
+      description += '...';
+      return description
+    }
+  };
+
+  renderPrice = (offer, resultsToUse) => {
+    let price = offer.price || offer.highPrice || offer.lowPrice;
+    if(!offer){
+      return false
+    } else {
+      let currencyMatch = currencyMappings[offer.currency];
+      return (
+        <p>
+          { !this.props.hidePrice && <span className={'priceText'}>{`${!!currencyMatch ? currencyMatch.symbol : ''}${price}`}</span>}
+          <span className={'greyText'}>{` from ${resultsToUse.site_name}`}</span>
+        </p>
+      )
+    }
+  };
+
+  renderSmallProduct = (resultsToUse) => {
+    let goodProduct = resultsToUse.products.find((p) => !!p.name);
+    let goodOffer = goodProduct.offers[0];
+    let imageSrc;
+    if(goodProduct.images && goodProduct.images.length > 1){
+      imageSrc =goodProduct.images[0];
+    } else {
+      imageSrc = resultsToUse.image;
+    }
+
+    return (
+      <div className="outerWrapperSmall">
+        <div style={{flex: 1}} >
+          <div className={"imgWrapperSmall"}>
+            <img className={'responsiveImage'} src={imageSrc} alt={'alt'}/>
+          </div>
+        </div>
+        <div className={"textWrapperSmall"}>
+          <div className={"siteNameLinkWrapper"}>
+            <a href={resultsToUse.url}>{goodProduct.name}</a>
+          </div>
+          <div className={"titleWrapper"}>
+            {this.renderPrice(goodOffer, resultsToUse)}
+          </div>
+          {!!goodProduct.totalRating && this.renderStarsForRating(goodProduct.totalRating)}
+          <p>{this.truncateDescription(goodProduct.description)}</p>
+        </div>
+
+      </div>
+    )
+  };
+
   renderLargeProduct = (resultsToUse, imageClassName) => {
     let goodProduct = resultsToUse.products.find((p) => !!p.name);
     let goodOffer = goodProduct.offers[0];
+    let imageSrc;
+    if(goodProduct.images && goodProduct.images.length > 1){
+      imageSrc =goodProduct.images[0];
+    } else {
+      imageSrc = resultsToUse.image;
+    }
+
     return (
       <div className="wrapperLarge">
-        { feature }
+        <div className={"imgWrapperLarge"}>
+          <img className={imageClassName} src={imageSrc} alt={'alt'}/>
+        </div>
         <div className={"textWrapperLarge"}>
           <div className={"siteNameLinkWrapper"}>
             <a href={resultsToUse.url}>{goodProduct.name}</a>
           </div>
           <div className={"titleWrapper"}>
-            <p><i>&#9733;</i>{goodProduct.description}</p>
+            {this.renderPrice(goodOffer, resultsToUse)}
           </div>
-          <p>{resultsToUse.description}</p>
+          {!!goodProduct.totalRating && this.renderStarsForRating(goodProduct.totalRating)}
+          <p>{this.truncateDescription(goodProduct.description)}</p>
         </div>
       </div>
     )
@@ -105,7 +196,7 @@ export default class OpengraphReactComponent extends Component {
 
     let feature = null;
 
-    if(resultsToUse.products){
+    if(resultsToUse.products && !this.props.dontUseProduct){
       return this.renderLargeProduct(resultsToUse, imageClassName)
     } else if (resultsToUse.video && !this.props.dontUseVideo){
       feature = (
@@ -145,18 +236,21 @@ export default class OpengraphReactComponent extends Component {
 
   renderSmall = (resultsToUse) => {
     let string = '';
-    return (
-      <div className="outerWrapperSmall">
-        <div style={{flex: 1}} >
-          <div className={"imgWrapperSmall"}>
-            <img className={'responsiveImage'} src={resultsToUse.image} alt={'alt'}/>
+    if(resultsToUse.products && !this.props.dontUseProduct){
+      return this.renderSmallProduct(resultsToUse)
+    } else {
+      return (
+        <div className="outerWrapperSmall">
+          <div style={{flex: 1}} >
+            <div className={"imgWrapperSmall"}>
+              <img className={'responsiveImage'} src={resultsToUse.image} alt={'alt'}/>
+            </div>
+            {/*{resultsToUse.image &&*/}
+
+            {/*<div className={'image'} style={{backgroundImage: `url("${resultsToUse.image}")`}}/>*/}
+
+            {/*}*/}
           </div>
-          {/*{resultsToUse.image &&*/}
-
-              {/*<div className={'image'} style={{backgroundImage: `url("${resultsToUse.image}")`}}/>*/}
-
-          {/*}*/}
-        </div>
           <div className={"textWrapperSmall"}>
             <div className={"siteNameLinkWrapper"}>
               <a href={resultsToUse.url}>{resultsToUse.site_name}</a>
@@ -167,8 +261,9 @@ export default class OpengraphReactComponent extends Component {
             <p>{resultsToUse.description}</p>
           </div>
 
-      </div>
-    )
+        </div>
+      )
+    }
   };
 
   passResultsToChildren = () => {

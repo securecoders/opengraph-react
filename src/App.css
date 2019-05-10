@@ -188,3 +188,16 @@
   height: auto;
   border-radius: 5px;
 }
+
+.coloredStar{
+  color: orange;
+}
+
+.greyText{
+  color: gray;
+}
+
+.priceText{
+  font-size: large;
+  font-weight: 600;
+}
