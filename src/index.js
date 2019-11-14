@@ -132,7 +132,8 @@ export default class OpengraphReactComponent extends Component {
 
   renderSmallProduct = (resultsToUse) => {
     let goodProduct = resultsToUse.products.find((p) => !!p.name);
-    let goodOffer = goodProduct.offers[0];
+    let goodOffers = goodProduct.offers || [];
+    let goodOffer = goodOffers[0];
     let imageSrc;
     if(goodProduct.images && goodProduct.images.length > 1){
       imageSrc =goodProduct.images[0];
@@ -152,7 +153,7 @@ export default class OpengraphReactComponent extends Component {
             <a href={resultsToUse.url}>{goodProduct.name}</a>
           </div>
           <div className={"titleWrapper"}>
-            {this.renderPrice(goodOffer, resultsToUse)}
+            {goodOffer && this.renderPrice(goodOffer, resultsToUse)}
           </div>
           {!!goodProduct.totalRating && this.renderStarsForRating(goodProduct.totalRating)}
           <p>{this.truncateDescription(goodProduct.description)}</p>
