@@ -132,6 +132,9 @@ export default class OpengraphReactComponent extends Component {
 
   renderSmallProduct = (resultsToUse) => {
     let goodProduct = resultsToUse.products.find((p) => !!p.name);
+    if(!goodProduct){
+      return null
+    }
     let goodOffers = goodProduct.offers || [];
     let goodOffer = goodOffers[0];
     let imageSrc;
@@ -165,6 +168,10 @@ export default class OpengraphReactComponent extends Component {
 
   renderLargeProduct = (resultsToUse, imageClassName) => {
     let goodProduct = resultsToUse.products.find((p) => !!p.name);
+    if(!goodProduct){
+      return null
+    }
+
     let goodOffers = goodProduct.offers || [];
     let goodOffer = goodOffers[0];
     let imageSrc;
