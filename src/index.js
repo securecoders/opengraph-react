@@ -232,12 +232,12 @@ export default class OpengraphReactComponent extends Component {
         { feature }
         <div className={"textWrapperLarge"}>
           <div className={"siteNameLinkWrapper"}>
-            <a href={resultsToUse.url}>{resultsToUse.site_name}</a>
+            <a href={resultsToUse.url}>{this.trimString(resultsToUse.site_name, 43)}</a>
           </div>
           <div className={"titleWrapper"}>
-            <p>{resultsToUse.title}</p>
+            <p>{this.trimString(resultsToUse.title, 50)}</p>
           </div>
-          <p>{resultsToUse.description}</p>
+          <p>{this.trimString(resultsToUse.description, 260)}</p>
         </div>
       </div>
     )
@@ -262,12 +262,12 @@ export default class OpengraphReactComponent extends Component {
           </div>
           <div className={"textWrapperSmall"}>
             <div className={"siteNameLinkWrapper"}>
-              <a href={resultsToUse.url}>{resultsToUse.site_name}</a>
+              <a href={resultsToUse.url}>{this.trimString(resultsToUse.site_name, 45)}</a>
             </div>
             <div className={"titleWrapper"}>
-              <p>{resultsToUse.title}</p>
+              <p>{this.trimString(resultsToUse.title, 55)}</p>
             </div>
-            <p>{resultsToUse.description}</p>
+            <p>{this.trimString(resultsToUse.description, 250)}</p>
           </div>
 
         </div>
@@ -285,6 +285,14 @@ export default class OpengraphReactComponent extends Component {
       </div>
     )
   };
+
+  trimString = (stringIn = '', trimLen) => {
+    let stringLen = stringIn.length;
+    return stringLen > trimLen ?
+      stringIn.substring(0, trimLen - 3) + "..." :
+      stringIn;
+  };
+
 
   render(){
     if(!this.state.result && !this.state.error){
