@@ -20,6 +20,8 @@ Simply install using npm:
 
 ## Usage
 
+    import OpengraphReactComponent from 'opengraph-react';
+    
     <OpengraphReactComponent  
       site={'site that you want to load (url encoding is done for you)'}  
       appId={Your opengraph.io api key goes here}  
