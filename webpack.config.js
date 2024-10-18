@@ -1,28 +1,37 @@
-var path = require('path');
+const path = require('path');
+
 module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'index.js',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'umd', // Ensures compatibility with different module systems
+    globalObject: 'this',
+  },
+  resolve: {
+    alias: {
+      react$: path.resolve(__dirname, 'node_modules/react'),
+    },
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        include: path.resolve(__dirname, 'src'),
-        exclude: /(node_modules|bower_components|build)/,
-        use: {
-          loader: 'babel-loader',
-        }
+        exclude: /node_modules/,
+        use: 'babel-loader',
       },
       {
         test: /\.css$/,
-        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
-      }
-    ]
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   },
   externals: {
-    'react': 'commonjs react'
-  }
+    react: {
+      commonjs: 'react',
+      commonjs2: 'react',
+      amd: 'react',
+      root: 'React',
+    },
+  },
 };
