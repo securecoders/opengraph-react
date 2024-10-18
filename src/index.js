@@ -15,7 +15,7 @@ const OpenGraphReactComponent = (props) => {
   const [ result, setResult ] = React.useState(null);
   const [ error, setError ] = React.useState(null);
 
-  const { component, customResults, debug, useProxy, fullRender, forceCacheUpdate, usePremium, useSuperior, disableAutoProxy, dontMakeCall, acceptLang, appId, site, loader, onlyFetch, dontUseVideo, dontUseProduct } = props;
+  const { component, results, debug, useProxy, fullRender, forceCacheUpdate, usePremium, useSuperior, disableAutoProxy, dontMakeCall, acceptLang, appId, site, loader, onlyFetch, dontUseVideo, dontUseProduct } = props;
 
   React.useEffect(() => {
     const fetchResults = async (url) => {
@@ -33,7 +33,7 @@ const OpenGraphReactComponent = (props) => {
     }
 
     if (dontMakeCall) {
-      setResult(customResults);
+      setResult(results);
     } else {
       const encodedSite = encodeURIComponent(site);
       let url = `http://localhost:3777/api/1.1/site/${encodedSite}?accept_lang${acceptLang ? acceptLang : 'auto'}&app_id=${appId}`;
@@ -93,7 +93,7 @@ const OpenGraphReactComponent = (props) => {
       if(onlyFetch){
         return passResultsToChildren();
       } else {
-        let resultsToUse = customResults && dontMakeCall ? customResults : getResultsToUse(result);
+        let resultsToUse = getResultsToUse(result);
         debug && console.log('RESULTS TO USE', resultsToUse);
 
         switch (component) {

@@ -61,7 +61,7 @@ const ExampleComponent = () => {
 | dontMakeCall                       | boolean   | Defaults to false. Setting to true will allow you set your own information to be displayed.                                                                       |
 | results                            | obj       | Custom [result object](#custom-results-object) passed when not making an API call.                                                                                |
 | loader                             | component | A component to display while loading (ex a spinner) won't display anything by default                                                                             |
-| [component](#available-components) | enum      | Defaults to 'large'. Options                                                                                                                                      |
+| [component](#available-components) | enum      | Defaults to 'large'.                                                                                                                                              |
 | onlyFetch                          | boolean   | If this prop is supplied then no card will display, but instead the results from opengraph will be passed as props to the components children                     |
 | acceptLang                         | string    | accept lang header for request, defaults to "auto"                                                                                                                |
 | disableAutoProxy                   | boolean   | Tells OpenGraph.io to not use the Auto Proxy. Defaults to false.                                                                                                  |
@@ -75,41 +75,39 @@ const ExampleComponent = () => {
 | debug                              | boolean   | Defaults to false. Want to see what results you're getting from the API? Just enable debug and look for 'RESULTS TO USE:' in the console.                         |
 
 ### Using Custom Site Results
-If you would like, you can pass in you own information to be displayed instead of making an API call.
+If you don't want to make the call directly from the opengraph-react component, you can fetch the results from the API and then display the results.
 
 ```javascript
 import OpengraphReactComponent from 'opengraph-react';
 
 const ExampleComponent = () => {
-  const siteInformation = {
-    site_name: "OpenGraph.io",
-    title: "OpenGraph.io",
-    favicon: "https://www.opengraph.io/favicon.ico",
-    description: "OpenGraph.io is a service that allows you to fetch OpenGraph data from any website.",
-    image: "https://www.opengraph.io/img/logo.png",
-    url: "https://www.opengraph.io",
-  };
+  const [results, setResults] = React.useState(null);
+  
+  const website = 'https://www.opengraph.io';
+  const appId = 'XXXXX'; //You're OpenGraph.io API Key goes here
+
+  React.useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        const response = await fetch(`https://opengraph.io/api/1.1/site/${encodeURIComponent(website)}?app_id=${appId}`);
+        const data = await response.json();
+        setResults(data);  
+      } catch (error) {
+        console.error(error);
+      }
+      
+    };
+    
+    fetchResults();
+  }, []);
   
   return (
-    <OpenGraphReactComponent
+    <OpengraphReactComponent
       dontMakeCall={true}
-      results={siteInformation}
+      results={results}
     />
   );
 };
-```
-
-### Custom Results Object
-
-```javascript
-{
-  site_name: string;
-  title: string;
-  favicon: string;
-  description: string;
-  image: string;
-  url: string;
-}
 ```
 
 
@@ -128,8 +126,8 @@ const ExampleComponent = () => {
 | acceptLang       | no       | en-US,en;q=0.9 auto | This specifies the request language sent when requesting the URL. This is useful if you want to get the site for languages other than English. The default setting for this will return an English version of a page if it exists. Note: if you specify the value auto, the API will use the same language settings as your current request. For more information on what to supply for this field, please see: [Accept-Language - MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) |
 
 ## Available Components
-Currently, there are 6 components available for use. They are as follows:
 
+Currently, there are 6 components available for use. They are as follows:
 - large
     - This will display a larger preview card. This is the default component.
 - small
