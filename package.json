@@ -1,6 +1,6 @@
 {
   "name": "opengraph-react",
-  "version": "1.3.12",
+  "version": "2.0.0",
   "description": "Handy React components for www.opengraph.io",
   "main": "build/index.js",
   "scripts": {
@@ -33,7 +33,8 @@
     "url",
     "react",
     "website",
-    "unfurl-url"
+    "unfurl-url",
+    "social media"
   ],
   "author": "Charles Wooley",
   "license": "ISC",
