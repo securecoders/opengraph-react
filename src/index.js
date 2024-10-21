@@ -36,7 +36,7 @@ const OpenGraphReactComponent = (props) => {
       setResult(results);
     } else {
       const encodedSite = encodeURIComponent(site);
-      let url = `http://localhost:3777/api/1.1/site/${encodedSite}?accept_lang${acceptLang ? acceptLang : 'auto'}&app_id=${appId}`;
+      let url = `https://opengraph.io/api/1.1/site/${encodedSite}?accept_lang${acceptLang ? acceptLang : 'auto'}&app_id=${appId}`;
 
       if (useProxy) {
         url = url + '&use_proxy=true'

@@ -186,13 +186,13 @@
 
 .responsiveImage{
   width: 100%;
-  height: auto;
+  height: 100%;
   border-radius: 5px;
 }
 
 .responsiveVideo{
   width: 100%;
-  height: auto;
+  height: 100%;
   border-radius: 5px;
 }
 
@@ -226,7 +226,7 @@
 
 .x-link-preview img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
 }
 
