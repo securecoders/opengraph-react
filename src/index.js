@@ -11,11 +11,19 @@ import LinkedInComponent from './components/linkedIn';
 import './App.css'
 
 const OpenGraphReactComponent = (props) => {
+  const { component, results,
+    debug, useProxy, fullRender,
+    forceCacheUpdate, usePremium,
+    useSuperior, disableAutoProxy,
+    dontMakeCall, acceptLang, appId,
+    site, loader, onlyFetch, dontUseVideo,
+    dontUseProduct, newResults } = props;
 
+  const [ resultsToUse, setResultsToUse ] = React.useState(null);
   const [ result, setResult ] = React.useState(null);
   const [ error, setError ] = React.useState(null);
 
-  const { component, results, debug, useProxy, fullRender, forceCacheUpdate, usePremium, useSuperior, disableAutoProxy, dontMakeCall, acceptLang, appId, site, loader, onlyFetch, dontUseVideo, dontUseProduct } = props;
+
 
   React.useEffect(() => {
     const fetchResults = async (url) => {
@@ -25,7 +33,7 @@ const OpenGraphReactComponent = (props) => {
         if (result.error) {
           setError(result.error);
         } else {
-          setResult(result);
+          setResult(prev => ({ ...prev, ...result }));
         }
       } catch (error) {
         setError(error);
@@ -33,7 +41,7 @@ const OpenGraphReactComponent = (props) => {
     }
 
     if (dontMakeCall) {
-      setResult(results);
+      setResult(getResultsToUse(results));
     } else {
       const encodedSite = encodeURIComponent(site);
       let url = `https://opengraph.io/api/1.1/site/${encodedSite}?accept_lang${acceptLang ? acceptLang : 'auto'}&app_id=${appId}`;
@@ -61,7 +69,13 @@ const OpenGraphReactComponent = (props) => {
     }
   }, [ ]);
 
-    const passResultsToChildren = () => {
+  React.useEffect(() => {
+    if (results) {
+      setResultsToUse(getResultsToUse(results));
+    }
+  }, [results]);
+
+  const passResultsToChildren = () => {
       if(!result){
         debug && console.log('NO RESULTS TO PASS');
         return false
@@ -93,22 +107,21 @@ const OpenGraphReactComponent = (props) => {
       if(onlyFetch){
         return passResultsToChildren();
       } else {
-        let resultsToUse = getResultsToUse(result);
         debug && console.log('RESULTS TO USE', resultsToUse);
 
         switch (component) {
           case 'x':
-            return <XComponent resultsToUse={resultsToUse} />
+            return <XComponent resultsToUse={resultsToUse}  updatedProperty={newResults} />
           case 'facebook':
-            return <FacebookComponent resultsToUse={resultsToUse} />
+            return <FacebookComponent resultsToUse={resultsToUse} updatedProperty={newResults} />
           case 'linkedin':
-            return <LinkedInComponent resultsToUse={resultsToUse} />
+            return <LinkedInComponent resultsToUse={resultsToUse} updatedProperty={newResults} />
           case 'large':
-            return <RenderLarge dontUseProduct={dontUseProduct} dontUseVideo={dontUseVideo} resultsToUse={resultsToUse} />
+            return <RenderLarge dontUseProduct={dontUseProduct} updatedProperty={newResults} dontUseVideo={dontUseVideo} resultsToUse={resultsToUse} />
           case 'small':
-            return <RenderSmall dontUseProduct={dontUseProduct} resultsToUse={resultsToUse} />
+            return <RenderSmall dontUseProduct={dontUseProduct} updatedProperty={newResults} resultsToUse={resultsToUse} />
           default:
-            return <RenderLarge dontUseProduct={dontUseProduct} dontUseVideo={dontUseVideo} resultsToUse={resultsToUse} />
+            return <RenderLarge dontUseProduct={dontUseProduct} updatedProperty={newResults} dontUseVideo={dontUseVideo} resultsToUse={resultsToUse} />
         }
       }
   }

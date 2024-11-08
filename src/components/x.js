@@ -3,7 +3,7 @@ import { trimString } from '../util/trimString';
 import { truncateDescription } from '../util/truncateDescription';
 import { getProductInfo } from '../util/getProductInfo';
 
-const XComponent = ({ resultsToUse } ) => {
+const XComponent = ({ resultsToUse, updatedProperty } ) => {
   let results = resultsToUse;
   const isProduct = resultsToUse.products && resultsToUse.products.length > 0;
 
@@ -11,10 +11,20 @@ const XComponent = ({ resultsToUse } ) => {
     results = getProductInfo(resultsToUse);
   }
 
+  React.useEffect(() => {
+    if(!updatedProperty){
+      return
+    }
+    if(updatedProperty){
+      results[updatedProperty.key] = updatedProperty.value;
+    }
+  } , [updatedProperty])
+
   return (
-    <div className={"x-link-preview"}>
+    <div className={"x-link-preview"} style={{
+      background: `center / contain no-repeat url(${results?.image})`
+    }}>
       <a target={'_blank'} style={{ textDecoration: 'none'}} href={results?.url}>
-        <img src={results.image} alt={'alt'}/>
         <p className={"url-overlay"}>{trimString(results.title, 55)}</p>
       </a>
     </div>

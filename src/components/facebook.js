@@ -9,10 +9,22 @@ const FacebookComponent = ({ resultsToUse, updatedProperty }) => {
     results = getProductInfo(resultsToUse);
   }
 
+  React.useEffect(() => {
+    const isProduct = resultsToUse?.products?.length > 0;
+    if(isProduct){
+      setResults(getProductInfo(resultsToUse));
+    }
+  }, [])
 
-  if(isProduct){
-    results = getProductInfo(resultsToUse);
+  React.useEffect(() => {
+    if(!updatedProperty){
+      return
   }
+    if(updatedProperty){
+      results[updatedProperty.key] = updatedProperty.value;
+    }
+  } , [updatedProperty])
+
 
   React.useEffect(() => {
     if(!updatedProperty){

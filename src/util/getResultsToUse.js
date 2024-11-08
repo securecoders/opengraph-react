@@ -1,5 +1,8 @@
 
 export const getResultsToUse = (result) => {
+  if(!result){
+    return null
+  }
   let {openGraph, htmlInferred, hybridGraph } = result;
   // protect against null values
   openGraph = openGraph || {};
