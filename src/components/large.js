@@ -4,6 +4,17 @@ import RenderProduct from './products';
 
 const RenderLarge = (props) => {
   let imageClassName = props.spin ? 'responsiveImage App-logo' : 'responsiveImage';
+  const { updatedProperty } = props;
+
+  React.useEffect(() => {
+    if(!updatedProperty){
+      return
+    }
+    if(updatedProperty){
+      props.resultsToUse[updatedProperty.key] = updatedProperty.value;
+    }
+
+  }, [updatedProperty])
 
   let feature = null;
 

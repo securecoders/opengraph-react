@@ -4,7 +4,15 @@ import { trimString } from '../util/trimString';
 import RenderProduct from './products';
 
 
-const RenderSmall = ({resultsToUse, dontUseProduct } ) => {
+const RenderSmall = ({resultsToUse, dontUseProduct, updatedProperty } ) => {
+  React.useEffect(() => {
+    if(!updatedProperty){
+      return
+    }
+    if(updatedProperty){
+      resultsToUse[updatedProperty.key] = updatedProperty.value;
+    }
+  }, [updatedProperty])
 
   if(resultsToUse.products && !dontUseProduct){
       return <RenderProduct resultsToUse={resultsToUse} size={'small'} />

@@ -3,7 +3,6 @@ import currencyMappings from '../../util/currencyMappings.json';
 
 const RenderPrice = ({ offer, resultsToUse, hidePrice }) => {
     let price = offer.price || offer.highPrice || offer.lowPrice;
-    console.log('resultsToUse', resultsToUse)
     if(!offer){
       return false
     } else {
