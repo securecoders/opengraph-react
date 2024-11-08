@@ -10,13 +10,6 @@ const FacebookComponent = ({ resultsToUse, updatedProperty }) => {
   }
 
   React.useEffect(() => {
-    const isProduct = resultsToUse?.products?.length > 0;
-    if(isProduct){
-      setResults(getProductInfo(resultsToUse));
-    }
-  }, [])
-
-  React.useEffect(() => {
     if(!updatedProperty){
       return
   }
