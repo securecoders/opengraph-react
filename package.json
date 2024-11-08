@@ -1,6 +1,6 @@
 {
   "name": "opengraph-react",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "description": "Handy React components for www.opengraph.io",
   "main": "build/index.js",
   "scripts": {
