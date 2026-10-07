@@ -4,6 +4,8 @@ import RenderLarge from './components/large';
 import RenderSmall from './components/small';
 
 import { getResultsToUse } from './util/getResultsToUse';
+import { buildRequestUrl } from './util/buildRequestUrl';
+import ErrorBoundary from './components/error';
 import XComponent from './components/x';
 import FacebookComponent from './components/facebook';
 import LinkedInComponent from './components/linkedIn';
@@ -17,9 +19,8 @@ const OpenGraphReactComponent = (props) => {
     useSuperior, disableAutoProxy,
     dontMakeCall, acceptLang, appId,
     site, loader, onlyFetch, dontUseVideo,
-    dontUseProduct, newResults } = props;
+    dontUseProduct, newResults, proxyUrl } = props;
 
-  const [ resultsToUse, setResultsToUse ] = React.useState(null);
   const [ result, setResult ] = React.useState(null);
   const [ error, setError ] = React.useState(null);
 
@@ -43,37 +44,20 @@ const OpenGraphReactComponent = (props) => {
     if (dontMakeCall) {
       setResult(getResultsToUse(results));
     } else {
-      const encodedSite = encodeURIComponent(site);
-      let url = `https://opengraph.io/api/1.1/site/${encodedSite}?accept_lang${acceptLang ? acceptLang : 'auto'}&app_id=${appId}`;
-
-      if (useProxy) {
-        url = url + '&use_proxy=true'
-      }
-      if (forceCacheUpdate) {
-        url = url + '&cache_ok=false';
-      }
-      if (fullRender) {
-        url = url + '&full_render=true';
-      }
-      if (usePremium) {
-        url = url + '&use_premium=true';
-      }
-      if (useSuperior) {
-        url = url + '&use_superior=true';
-      }
-      if (disableAutoProxy) {
-        url = url + '&auto_proxy=false';
-      }
-
-      fetchResults(url);
+      fetchResults(buildRequestUrl({
+        site, appId, proxyUrl, acceptLang,
+        useProxy, forceCacheUpdate, fullRender,
+        usePremium, useSuperior, disableAutoProxy,
+      }));
     }
   }, [ ]);
 
-  React.useEffect(() => {
-    if (results) {
-      setResultsToUse(getResultsToUse(results));
-    }
-  }, [results]);
+  // The fetch path only ever filled `result`, so cards got a null
+  // resultsToUse and crashed (OGR-009).
+  const resultsToUse = React.useMemo(
+    () => getResultsToUse(dontMakeCall || (results && !result) ? results : result),
+    [dontMakeCall, results, result]
+  );
 
   const passResultsToChildren = () => {
       if(!result){
@@ -85,16 +69,18 @@ const OpenGraphReactComponent = (props) => {
         });
 
         return (
-          <div>
-            {children}
-          </div>
+          <ErrorBoundary debug={debug}>
+            <div>
+              {children}
+            </div>
+          </ErrorBoundary>
         )
       }
     }
 
 
 
-  if(!result && !error){
+  if(!resultsToUse && !error){
       if(loader){
         return loader
       } else {
@@ -109,6 +95,11 @@ const OpenGraphReactComponent = (props) => {
       } else {
         debug && console.log('RESULTS TO USE', resultsToUse);
 
+        return <ErrorBoundary debug={debug}>{renderCard()}</ErrorBoundary>;
+      }
+  }
+
+  function renderCard() {
         switch (component) {
           case 'x':
             return <XComponent resultsToUse={resultsToUse}  updatedProperty={newResults} />
@@ -123,7 +114,6 @@ const OpenGraphReactComponent = (props) => {
           default:
             return <RenderLarge dontUseProduct={dontUseProduct} updatedProperty={newResults} dontUseVideo={dontUseVideo} resultsToUse={resultsToUse} />
         }
-      }
   }
 }
 

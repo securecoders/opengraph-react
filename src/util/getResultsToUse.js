@@ -1,3 +1,17 @@
+import { safeUrl } from './safeUrl';
+
+const sanitizeProducts = (products) => {
+  if (!Array.isArray(products)) {
+    return undefined;
+  }
+  const cleaned = products
+    .filter((product) => product && typeof product === 'object')
+    .map((product) => ({
+      ...product,
+      images: Array.isArray(product.images) ? product.images.map(safeUrl).filter(Boolean) : [],
+    }));
+  return cleaned.length > 0 ? cleaned : undefined;
+};
 
 export const getResultsToUse = (result) => {
   if(!result){
@@ -18,14 +32,14 @@ export const getResultsToUse = (result) => {
 
   let image;
   if(openGraph.image){
-    image = openGraph.image.url;
+    image = typeof openGraph.image === 'object' ? openGraph.image.url : openGraph.image;
   } else {
     image = htmlInferred.image || hybridGraph.image || result.image;
   }
 
   let video;
   if(openGraph.video){
-    video = openGraph.video.secure_url
+    video = typeof openGraph.video === 'object' ? (openGraph.video.secure_url || openGraph.video.url) : openGraph.video;
   } else {
     video = hybridGraph.video || htmlInferred.video || result.video;
   }
@@ -33,11 +47,11 @@ export const getResultsToUse = (result) => {
   return {
     site_name,
     title,
-    url,
-    favicon,
-    image,
+    url: safeUrl(url),
+    favicon: safeUrl(favicon),
+    image: safeUrl(image),
     description,
-    video,
-    products
+    video: safeUrl(video),
+    products: sanitizeProducts(products)
   };
 };

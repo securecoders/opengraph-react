@@ -26,7 +26,7 @@ const RenderSmall = ({resultsToUse, dontUseProduct, updatedProperty } ) => {
         </div>
         <div className={"textWrapperSmall"}>
           <div className={"siteNameLinkWrapper"}>
-            <a target={'_blank'} href={resultsToUse?.url}>{trimString(resultsToUse?.site_name, 45)}</a>
+            <a target={'_blank'} rel={'noopener noreferrer'} href={resultsToUse?.url}>{trimString(resultsToUse?.site_name, 45)}</a>
           </div>
           <div className={"titleWrapper"}>
             <p>{trimString(resultsToUse?.title, 55)}</p>

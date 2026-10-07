@@ -1,7 +1,7 @@
 
 export const getProductInfo = (result) => {
   let newResult;
-  let goodProduct = result.products.find((p) => !!p.name);
+  let goodProduct = Array.isArray(result.products) && result.products.find((p) => p && !!p.name);
   if(!goodProduct){
     return null
   }
@@ -14,13 +14,10 @@ export const getProductInfo = (result) => {
     imageSrc = result.image;
   }
 
-
-  const url = new URL(result.url);
-
   newResult = {
     site_name: result.site_name,
     title: goodProduct.name,
-    url: url,
+    url: result.url,
     favicon: result.favicon,
     image: imageSrc,
     description: goodProduct.description ? goodProduct.description : result.description,

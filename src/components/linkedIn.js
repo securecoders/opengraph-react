@@ -8,7 +8,7 @@ const LinkedInComponent = ({ resultsToUse, updatedProperty }) => {
   let parsedUrl;
 
   if(isProduct){
-    results = getProductInfo(resultsToUse);
+    results = getProductInfo(resultsToUse) || resultsToUse;
   }
 
   React.useEffect(() => {
@@ -20,13 +20,15 @@ const LinkedInComponent = ({ resultsToUse, updatedProperty }) => {
     }
   } , [updatedProperty])
 
-  const url = new URL(results?.url);
-  let urlDomain = url?.host;
-  parsedUrl = psl.parse(urlDomain);
+  try {
+    parsedUrl = psl.parse(new URL(results?.url).hostname);
+  } catch (e) {
+    parsedUrl = null;
+  }
 
   return (
     <div className={"linkedin-link-preview"}>
-      <a target={'_blank'} href={results?.url} style={{ textDecoration: 'none'}}>
+      <a target={'_blank'} rel={'noopener noreferrer'} href={results?.url} style={{ textDecoration: 'none'}}>
       {resultsToUse?.image ? <img className={"linkedin-link-preview_image"} src={results?.image} alt={'alt'}/> : null}
       <div className={"linkedin-link-preview_description"}>
         <p className={"linkedin-link-preview_title"}>{results?.title}</p>
