@@ -8,7 +8,7 @@ const XComponent = ({ resultsToUse, updatedProperty } ) => {
   const isProduct = resultsToUse.products && resultsToUse.products.length > 0;
 
   if(isProduct){
-    results = getProductInfo(resultsToUse);
+    results = getProductInfo(resultsToUse) || resultsToUse;
   }
 
   React.useEffect(() => {
@@ -22,9 +22,9 @@ const XComponent = ({ resultsToUse, updatedProperty } ) => {
 
   return (
     <div className={"x-link-preview"} style={{
-      background: `center / contain no-repeat url(${results?.image})`
+      background: `center / contain no-repeat url("${results?.image}")`
     }}>
-      <a target={'_blank'} style={{ textDecoration: 'none'}} href={results?.url}>
+      <a target={'_blank'} rel={'noopener noreferrer'} style={{ textDecoration: 'none'}} href={results?.url}>
         <p className={"url-overlay"}>{trimString(results.title, 55)}</p>
       </a>
     </div>

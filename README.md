@@ -52,12 +52,19 @@ const ExampleComponent = () => {
 };
 ```
 
+> **Your `appId` is public.** Anything passed to this component ships to the
+> browser, so anyone can read the key from your page and spend your quota.
+> Either use a key restricted to your domain in the
+> [dashboard](https://dashboard.opengraph.io), or set [`proxyUrl`](#keeping-your-key-on-a-server)
+> and keep the key on your server.
+
 ## Props
 
 | Name                               | Type      | Description                                                                                                                                                       |
 |------------------------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | site                               | string    | Website that you want to load uri encoding is done for you so no need to encode it                                                                                |
-| appId                              | string    | Your ApiKey for opengraph.io (you can get one at https://dashboard.opengraph.io)                                                                                  |
+| appId                              | string    | Your ApiKey for opengraph.io (you can get one at https://dashboard.opengraph.io). Visible to anyone who loads your page; see the note above.                     |
+| proxyUrl                           | string    | URL of your own endpoint that calls OpenGraph.io server-side. When set, `appId` is never sent. See [Keeping your key on a server](#keeping-your-key-on-a-server). |
 | dontMakeCall                       | boolean   | Defaults to false. Setting to true will allow you set your own information to be displayed.                                                                       |
 | results                            | obj       | Custom [result object](#custom-results-object) passed when not making an API call.                                                                                |
 | loader                             | component | A component to display while loading (ex a spinner) won't display anything by default                                                                             |
@@ -110,6 +117,32 @@ const ExampleComponent = () => {
 };
 ```
 
+
+### Keeping your key on a server
+Pass `proxyUrl` instead of `appId` and the component will `GET` that URL with
+the target in a `site` query parameter, plus the same option parameters it
+would otherwise send to OpenGraph.io (`accept_lang`, `full_render`,
+`use_proxy`, `use_premium`, `use_superior`, `cache_ok`, `auto_proxy`). Your
+endpoint adds the key and forwards the request:
+
+```javascript
+<OpengraphReactComponent site="https://www.opengraph.io" proxyUrl="/api/opengraph" />
+```
+
+```javascript
+// Example Express handler for /api/opengraph
+app.get('/api/opengraph', async (req, res) => {
+  const { site, ...options } = req.query;
+  const upstream = new URL(`https://opengraph.io/api/1.1/site/${encodeURIComponent(site)}`);
+  for (const [key, value] of Object.entries(options)) upstream.searchParams.set(key, value);
+  upstream.searchParams.set('app_id', process.env.OPENGRAPH_APP_ID);
+  const response = await fetch(upstream);
+  res.status(response.status).json(await response.json());
+});
+```
+
+Add your own authentication and rate limiting to this endpoint; otherwise it
+just moves the open quota from your key to your server.
 
 ## OpenGraph.io API Parameters
 ### Below is a list of parameters and their descriptions, which can be passed to the OpenGraph.io API through the opengraph-react component.

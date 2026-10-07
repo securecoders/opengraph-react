@@ -1,6 +1,7 @@
 import React from 'react';
 import { trimString } from '../util/trimString';
 import RenderProduct from './products';
+import { safeVideoEmbedUrl } from '../util/safeUrl';
 
 const RenderLarge = (props) => {
   let imageClassName = props.spin ? 'responsiveImage App-logo' : 'responsiveImage';
@@ -17,17 +18,20 @@ const RenderLarge = (props) => {
   }, [updatedProperty])
 
   let feature = null;
+  const videoSrc = safeVideoEmbedUrl(props?.resultsToUse?.video);
 
   if(props.resultsToUse.products && !props.dontUseProduct){
     return <RenderProduct resultsToUse={props.resultsToUse} size={'large'} />
-  } else if (props?.resultsToUse?.video && !props.dontUseVideo){
+  } else if (videoSrc && !props.dontUseVideo){
     feature = (
       <div className={"imgWrapperLarge"}>
         <iframe
           className={'responsiveVideo'}
-          src={props?.resultsToUse?.video}
+          src={videoSrc}
           frameBorder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
+          allow="encrypted-media; picture-in-picture; fullscreen"
+          referrerPolicy="strict-origin-when-cross-origin"
           allowFullScreen
         />
       </div>
@@ -45,7 +49,7 @@ const RenderLarge = (props) => {
       { feature }
       <div className={"textWrapperLarge"}>
         <div className={"siteNameLinkWrapper"}>
-          <a target={'_blank'} href={props?.resultsToUse?.url}>{trimString(props?.resultsToUse?.site_name, 43)}</a>
+          <a target={'_blank'} rel={'noopener noreferrer'} href={props?.resultsToUse?.url}>{trimString(props?.resultsToUse?.site_name, 43)}</a>
         </div>
         <div className={"titleWrapper"}>
           <p>{trimString(props?.resultsToUse?.title, 50)}</p>

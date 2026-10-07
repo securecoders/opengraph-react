@@ -6,7 +6,7 @@ const FacebookComponent = ({ resultsToUse, updatedProperty }) => {
 
   const isProduct = resultsToUse.products && resultsToUse.products.length > 0;
   if(isProduct){
-    results = getProductInfo(resultsToUse);
+    results = getProductInfo(resultsToUse) || resultsToUse;
   }
 
   React.useEffect(() => {
@@ -31,10 +31,10 @@ const FacebookComponent = ({ resultsToUse, updatedProperty }) => {
 
   return (
     <div className={"facebook-link-preview"}>
-      <a target={'_blank'} style={{ textDecoration: 'none'}} href={results?.url}>
+      <a target={'_blank'} rel={'noopener noreferrer'} style={{ textDecoration: 'none'}} href={results?.url}>
       {results?.image ? <div style={{
         border: '1px solid #dddfe2',
-        background: `center / contain no-repeat url(${results?.image})`,
+        background: `center / contain no-repeat url("${results?.image}")`,
         height: '274px',
       }}></div> : null}
         <div className="facebook-link-preview_description">

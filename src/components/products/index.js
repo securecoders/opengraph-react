@@ -4,7 +4,7 @@ import RenderPrice from './price';
 import RenderStarsForRating from './starsForRatings';
 
 const RenderProduct = ({ resultsToUse, size }) => {
-    let goodProduct = resultsToUse.products.find((p) => !!p.name);
+    let goodProduct = Array.isArray(resultsToUse.products) && resultsToUse.products.find((p) => p && !!p.name);
     if(!goodProduct){
       return null
     }
@@ -27,7 +27,7 @@ const RenderProduct = ({ resultsToUse, size }) => {
         </div>
         <div className={`textWrapper${size === 'large' ? 'Large' : 'Small'}`}>
           <div className={"siteNameLinkWrapper"}>
-            <a href={resultsToUse.url}>{goodProduct.name}</a>
+            <a rel={'noopener noreferrer'} href={resultsToUse.url}>{goodProduct.name}</a>
           </div>
           <div className={"titleWrapper"}>
             {goodOffer && <RenderPrice offer={goodOffer} resultsToUse={resultsToUse} hidePrice={false} />}
