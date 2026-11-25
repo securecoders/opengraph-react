@@ -6,6 +6,7 @@ import LinkedInComponent from '../components/linkedIn';
 import ErrorBoundary from '../components/error';
 import { getProductInfo } from '../util/getProductInfo';
 import { buildRequestUrl } from '../util/buildRequestUrl';
+import { requestResults, clearResultsCache } from '../util/requestResults';
 
 const ogResponse = {
   openGraph: { title: 'Example', url: 'https://example.com/', image: { url: 'https://example.com/og.png' } },
@@ -20,6 +21,7 @@ const mockFetch = (body) => {
 
 afterEach(() => {
   delete global.fetch;
+  clearResultsCache();
 });
 
 describe('default fetch path', () => {
@@ -97,5 +99,114 @@ describe('video iframe', () => {
       expect(container.querySelector('iframe')).toBeNull();
       expect(container.querySelector('img')).not.toBeNull();
     }
+  });
+});
+
+// OGR-005 follow-up (#46): every mount used to issue its own request, with no
+// way to stop one whose card had already left the page. In direct mode each of
+// those requests spends the site's API key from a visitor's browser.
+describe('request sharing', () => {
+  const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  it('makes one request when the same card is mounted several times', async () => {
+    const fetchMock = mockFetch(ogResponse);
+    const { container } = render(
+      <div>
+        <OpenGraphReactComponent site="https://example.com" appId="abc" />
+        <OpenGraphReactComponent site="https://example.com" appId="abc" />
+        <OpenGraphReactComponent site="https://example.com" appId="abc" component="small" />
+      </div>
+    );
+
+    await waitFor(() => expect(container.querySelectorAll('img').length).toBeGreaterThanOrEqual(2));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('makes one request under React.StrictMode', async () => {
+    const fetchMock = mockFetch(ogResponse);
+    const { container } = render(
+      <React.StrictMode>
+        <OpenGraphReactComponent site="https://example.com" appId="abc" />
+      </React.StrictMode>
+    );
+
+    await waitFor(() => expect(container.querySelector('.wrapperLarge')).not.toBeNull());
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][1].signal.aborted).toBe(false);
+  });
+
+  it('reuses a recent answer for a later mount, and asks again for a different site', async () => {
+    const fetchMock = mockFetch(ogResponse);
+    const first = render(<OpenGraphReactComponent site="https://example.com" appId="abc" />);
+    await waitFor(() => expect(first.container.querySelector('.wrapperLarge')).not.toBeNull());
+    first.unmount();
+
+    const second = render(<OpenGraphReactComponent site="https://example.com" appId="abc" />);
+    await waitFor(() => expect(second.container.querySelector('.wrapperLarge')).not.toBeNull());
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const third = render(<OpenGraphReactComponent site="https://example.org" appId="abc" />);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(third.container.querySelector('.wrapperLarge')).not.toBeNull());
+  });
+
+  it('always asks again when forceCacheUpdate is set', async () => {
+    const fetchMock = mockFetch(ogResponse);
+    const first = render(<OpenGraphReactComponent site="https://example.com" appId="abc" forceCacheUpdate />);
+    await waitFor(() => expect(first.container.querySelector('.wrapperLarge')).not.toBeNull());
+    first.unmount();
+
+    const second = render(<OpenGraphReactComponent site="https://example.com" appId="abc" forceCacheUpdate />);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(second.container.querySelector('.wrapperLarge')).not.toBeNull());
+  });
+
+  it('aborts a request once the only card waiting for it unmounts', async () => {
+    global.fetch = jest.fn(() => new Promise(() => {}));
+    const { unmount } = render(<OpenGraphReactComponent site="https://example.com" appId="abc" />);
+    const { signal } = global.fetch.mock.calls[0][1];
+    expect(signal.aborted).toBe(false);
+
+    unmount();
+    await tick();
+    expect(signal.aborted).toBe(true);
+  });
+
+  it('keeps a shared request alive while another card still waits for it', async () => {
+    global.fetch = jest.fn(() => new Promise(() => {}));
+    const first = render(<OpenGraphReactComponent site="https://example.com" appId="abc" />);
+    render(<OpenGraphReactComponent site="https://example.com" appId="abc" />);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    first.unmount();
+    await tick();
+    expect(global.fetch.mock.calls[0][1].signal.aborted).toBe(false);
+  });
+
+  it('does not remember an error response or a failed request', async () => {
+    mockFetch({ error: { code: 101, message: 'Invalid API key' } });
+    await requestResults('https://opengraph.io/api/1.1/site/x?app_id=bad').promise;
+    mockFetch(ogResponse);
+    const body = await requestResults('https://opengraph.io/api/1.1/site/x?app_id=bad').promise;
+    expect(body).toEqual(ogResponse);
+
+    global.fetch = jest.fn(() => Promise.reject(new Error('offline')));
+    await expect(requestResults('https://opengraph.io/api/1.1/site/y').promise).rejects.toThrow('offline');
+    mockFetch(ogResponse);
+    await expect(requestResults('https://opengraph.io/api/1.1/site/y').promise).resolves.toEqual(ogResponse);
+  });
+
+  it('does not update a card after it unmounted', async () => {
+    let resolveFetch;
+    global.fetch = jest.fn(() => new Promise((resolve) => { resolveFetch = resolve; }));
+    const errors = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const keep = render(<OpenGraphReactComponent site="https://example.com" appId="abc" />);
+    const gone = render(<OpenGraphReactComponent site="https://example.com" appId="abc" />);
+
+    gone.unmount();
+    resolveFetch({ json: () => Promise.resolve(ogResponse) });
+    await waitFor(() => expect(keep.container.querySelector('.wrapperLarge')).not.toBeNull());
+    expect(errors).not.toHaveBeenCalled();
+    errors.mockRestore();
   });
 });

@@ -2,6 +2,8 @@ const path = require('path');
 
 module.exports = {
   mode: 'production',
+  // Ship a source map so consumers can read what the published bundle was built from.
+  devtool: 'source-map',
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'build'),
