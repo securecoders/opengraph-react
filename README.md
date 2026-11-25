@@ -144,6 +144,13 @@ app.get('/api/opengraph', async (req, res) => {
 Add your own authentication and rate limiting to this endpoint; otherwise it
 just moves the open quota from your key to your server.
 
+### How many requests a card makes
+Cards that ask for the same site with the same options share one request, and a
+successful answer is reused for 60 seconds. Showing one link several times on a
+page, or re-mounting a card, therefore costs one API request, not one per mount.
+A request is cancelled when the last card waiting for it leaves the page.
+`forceCacheUpdate` always makes a new request.
+
 ## OpenGraph.io API Parameters
 ### Below is a list of parameters and their descriptions, which can be passed to the OpenGraph.io API through the opengraph-react component.
 

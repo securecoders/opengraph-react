@@ -5,6 +5,7 @@ import RenderSmall from './components/small';
 
 import { getResultsToUse } from './util/getResultsToUse';
 import { buildRequestUrl } from './util/buildRequestUrl';
+import { requestResults } from './util/requestResults';
 import ErrorBoundary from './components/error';
 import XComponent from './components/x';
 import FacebookComponent from './components/facebook';
@@ -27,29 +28,41 @@ const OpenGraphReactComponent = (props) => {
 
 
   React.useEffect(() => {
-    const fetchResults = async (url) => {
-      try {
-        const response = await fetch(url);
-        const result = await response.json();
-        if (result.error) {
-          setError(result.error);
-        } else {
-          setResult(prev => ({ ...prev, ...result }));
-        }
-      } catch (error) {
-        setError(error);
-      }
-    }
-
     if (dontMakeCall) {
       setResult(getResultsToUse(results));
-    } else {
-      fetchResults(buildRequestUrl({
-        site, appId, proxyUrl, acceptLang,
-        useProxy, forceCacheUpdate, fullRender,
-        usePremium, useSuperior, disableAutoProxy,
-      }));
+      return undefined;
     }
+
+    const url = buildRequestUrl({
+      site, appId, proxyUrl, acceptLang,
+      useProxy, forceCacheUpdate, fullRender,
+      usePremium, useSuperior, disableAutoProxy,
+    });
+
+    // Identical requests are shared, and a request nobody is waiting for any
+    // more is aborted, so mounting the same card many times (a list, a
+    // re-render, StrictMode) costs one API request instead of one per mount.
+    let active = true;
+    const request = requestResults(url, { skipCache: Boolean(forceCacheUpdate) });
+
+    request.promise.then(
+      (body) => {
+        if (!active) return;
+        if (body && body.error) {
+          setError(body.error);
+        } else {
+          setResult(prev => ({ ...prev, ...body }));
+        }
+      },
+      (err) => {
+        if (active) setError(err);
+      }
+    );
+
+    return () => {
+      active = false;
+      request.release();
+    };
   }, [ ]);
 
   // The fetch path only ever filled `result`, so cards got a null
